@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-# Copyright (c) 2016-2017 HIS e. G.
+# Copyright (c) 2016-2026 HIS e. G.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -22,39 +22,36 @@
 import json
 import datetime
 
+
 def ret200(cause):
-    retHttp(200,cause)
+    retHttp(200, cause)
 
 
 def ret403(cause):
-    retHttp(403,cause)
+    retHttp(403, cause)
 
 
 def ret400(cause):
-    retHttp(400,cause)
+    retHttp(400, cause)
 
 
 def retHttp(status, cause):
-    print("Status: " + str(status) + " Ok\r")
+    print(f"Status: {status} Ok\r")
     print("Content-Type: text/plain; charset='utf-8'\r")
     print("\r")
     print(cause)
 
 
 def retJson(data):
-    """ send a JSON onject to the client """
-    
+    """send a JSON object to the client"""
+
     print("Status: 200 Ok\r")
-    #print("Content-Type: text/plain; charset='utf-8'\r")
     print("Content-Type: application/json; charset='utf-8'\r")
     print("\r")
-    
-    date_handler = lambda obj: (
-        obj.isoformat()
-        if isinstance(obj, datetime.datetime)
-        or isinstance(obj, datetime.date)
-        else None
-        )
-    jsonString = json.dumps(data, default=date_handler)
-    print(jsonString)
-    
+
+    def date_handler(obj):
+        if isinstance(obj, (datetime.datetime, datetime.date)):
+            return obj.isoformat()
+        return None
+
+    print(json.dumps(data, default=date_handler))

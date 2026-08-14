@@ -1,6 +1,5 @@
-# coding=UTF-8
 # The MIT License (MIT)
-# Copyright (c) 2016-2017 HIS e. G.
+# Copyright (c) 2016-2026 HIS e. G.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -35,7 +34,7 @@ class Extension:
     def install_extension_setup(self, config):
         """install.py - hook invoked after reading the configuration file"""
 
-        if not "repository_status_permission" in config:
+        if "repository_status_permission" not in config:
             print("ERROR: Configuration for committstop is missing.")
             self.install_print_config_stub()
             sys.exit(1)
@@ -77,5 +76,3 @@ CREATE TABLE IF NOT EXISTS repository_status (
             warnings.simplefilter("ignore")
             db.query(create_config_table_sql, None, cursor_type=None)
         db.disconnect()
-
-

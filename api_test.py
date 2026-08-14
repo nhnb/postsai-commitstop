@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-# Copyright (c) 2016-2017 HIS e. G.
+# Copyright (c) 2016-2026 HIS e. G.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -20,7 +20,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 
-from permissions import checkPrivilege
+from permissions.checkPrivilege import checkLines, checkLinesSyntax
 
 import unittest
 
@@ -37,7 +37,7 @@ class CheckPrivilegeTests(unittest.TestCase):
 + .* .* .* .* .* |<| Grant access
 - .* .* .* .* .* |<| Deny access
 """
-        self.assertEqual(checkPrivilege.checkLines(conf, "repo", "branch", "user", "", "commitmsg"), (True, "Grant access"), "Grant access")
+        self.assertEqual(checkLines(conf, "repo", "branch", "user", "", "commitmsg"), (True, "Grant access"), "Grant access")
 
 
     def test_first_matching_rule_is_deny(self):
@@ -47,7 +47,7 @@ class CheckPrivilegeTests(unittest.TestCase):
 - .* .* .* .* .* |<| Deny access
 + .* .* .* .* .* |<| Grant access
 """
-        self.assertEqual(checkPrivilege.checkLines(conf, "repo", "branch", "user", "", "commitmsg"), (False, "Deny access"), "Deny access")
+        self.assertEqual(checkLines(conf, "repo", "branch", "user", "", "commitmsg"), (False, "Deny access"), "Deny access")
 
 
     def test_deny_if_no_match(self):
@@ -56,7 +56,7 @@ class CheckPrivilegeTests(unittest.TestCase):
         conf = """
 + otherrepo .* .* .* .* |<| Grant access
 """
-        self.assertEqual(checkPrivilege.checkLines(conf, "repo", "branch", "user", "", "commitmsg"), (False, "Commit Stop Check: Rejected by default."), "Commit Stop Check: Rejected by default.")
+        self.assertEqual(checkLines(conf, "repo", "branch", "user", "", "commitmsg"), (False, "Commit Stop Check: Rejected by default."), "Commit Stop Check: Rejected by default.")
 
 
     def test_full_match(self):
@@ -65,12 +65,12 @@ class CheckPrivilegeTests(unittest.TestCase):
         conf = """
 + repo branch user group 12345 |<| Grant access
 """
-        self.assertEqual(checkPrivilege.checkLines(conf, "otherrepo", "branch", "user", "group", "12345"), (False, "Commit Stop Check: Rejected by default."), "Commit Stop Check: Rejected by default.")
-        self.assertEqual(checkPrivilege.checkLines(conf, "repo", "otherbranch", "user", "group", "12345"), (False, "Commit Stop Check: Rejected by default."), "Commit Stop Check: Rejected by default.")
-        self.assertEqual(checkPrivilege.checkLines(conf, "repo", "branch", "otheruser", "group", "12345"), (False, "Commit Stop Check: Rejected by default."), "Commit Stop Check: Rejected by default.")
-        self.assertEqual(checkPrivilege.checkLines(conf, "repo", "branch", "user", "othergroup", "12345"), (False, "Commit Stop Check: Rejected by default."), "Commit Stop Check: Rejected by default.")
-        self.assertEqual(checkPrivilege.checkLines(conf, "repo", "branch", "user", "group", "other12345"), (False, "Commit Stop Check: Rejected by default."), "Commit Stop Check: Rejected by default.")
-        self.assertEqual(checkPrivilege.checkLines(conf, "repo", "branch", "user", "group", "12345"), (True, "Grant access"), "Complete match")
+        self.assertEqual(checkLines(conf, "otherrepo", "branch", "user", "group", "12345"), (False, "Commit Stop Check: Rejected by default."), "Commit Stop Check: Rejected by default.")
+        self.assertEqual(checkLines(conf, "repo", "otherbranch", "user", "group", "12345"), (False, "Commit Stop Check: Rejected by default."), "Commit Stop Check: Rejected by default.")
+        self.assertEqual(checkLines(conf, "repo", "branch", "otheruser", "group", "12345"), (False, "Commit Stop Check: Rejected by default."), "Commit Stop Check: Rejected by default.")
+        self.assertEqual(checkLines(conf, "repo", "branch", "user", "othergroup", "12345"), (False, "Commit Stop Check: Rejected by default."), "Commit Stop Check: Rejected by default.")
+        self.assertEqual(checkLines(conf, "repo", "branch", "user", "group", "other12345"), (False, "Commit Stop Check: Rejected by default."), "Commit Stop Check: Rejected by default.")
+        self.assertEqual(checkLines(conf, "repo", "branch", "user", "group", "12345"), (True, "Grant access"), "Complete match")
 
 
     def test_syntax_check(self):
@@ -78,11 +78,11 @@ class CheckPrivilegeTests(unittest.TestCase):
 
         conf = """
 # bla
-  
+
 + .* .* .* .* .* |<| Grant access
 - .* .* .* .* .* |<| Deny access
 """
-        self.assertEqual(checkPrivilege.checkLinesSyntax(conf), (True, "ok."), "syntax check")
+        self.assertEqual(checkLinesSyntax(conf), (True, "ok."), "syntax check")
 
 
     def test_syntax_check_failing(self):
@@ -91,9 +91,10 @@ class CheckPrivilegeTests(unittest.TestCase):
         conf = """
 Hurz!
 """
-        (equality, msg)=checkPrivilege.checkLinesSyntax(conf)
-        print equality
+        equality, msg = checkLinesSyntax(conf)
+        print(equality)
         self.assertEqual(equality, False, "syntax check")
+
 
 if __name__ == '__main__':
     unittest.main()

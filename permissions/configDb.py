@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-# Copyright (c) 2016-2017 HIS e. G.
+# Copyright (c) 2016-2026 HIS e. G.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -20,7 +20,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 from backend.db import PostsaiDB
-from response import ret200
+from permissions.response import ret200
 import config
 
 
@@ -68,7 +68,7 @@ def mock():
 +   cs.sys.externalapps.browser     .*                    .*               .*            bla blubb oink honk
 
 #  Temporaere Ausnahme fuer Benutzer abc auf Repository webapps Version 2017.06
-+   webapps                         VERSION_2017_06       abc              .*        
++   webapps                         VERSION_2017_06       abc              .*
 
 #  Commits nach 2016.06 auf HISinOne-Repositories verbieten
 -   cs.*|cm.*|rt.*|rm.*|webapps     VERSION_2017_06       .*               .*            |<| Geplanter Commit-Stop bis zum 10.11.2016

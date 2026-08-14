@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 '''
  -- commit permission check for Git
@@ -16,18 +16,12 @@ repo @all
 '''
 
 import base64
-import httplib
+import http.client
 import os
 import re
 import subprocess
 import sys
-import urlparse
-import urllib
-
-try:
-    from subprocess import DEVNULL # py3k
-except ImportError:
-    DEVNULL = open(os.devnull, 'wb')
+import urllib.parse
 
 
 class PermissionChecker:
@@ -55,20 +49,20 @@ class PermissionChecker:
 
         if "GL_OPTION_checkcommitstopurl" in os.environ:
             self.urls = [os.environ["GL_OPTION_checkcommitstopurl"]]
-            return;
-        
+            return
+
         if "checkcommitstopurl" in os.environ:
             self.urls = [os.environ["checkcommitstopurl"]]
-            return;
-        
+            return
+
         if os.path.exists("/etc/checkcommitstop"):
             with open("/etc/checkcommitstop") as f:
                 self.urls = f.read().splitlines()
-                return;
+                return
 
-        print ("Please create a file /etc/checkcommitstop which contains one targe url per line.")
-        print ("If you use Gitlote, you may also add this to the repo config instead:")
-        print ("option ENV.checkcommitstopurl=https://example.com/postsai/extensions/commitstop/api.py")
+        print("Please create a file /etc/checkcommitstop which contains one target url per line.")
+        print("If you use Gitolite, you may also add this to the repo config instead:")
+        print("option ENV.checkcommitstopurl=https://example.com/postsai/extensions/commitstop/api.py")
         sys.exit(2)
 
 
@@ -81,7 +75,7 @@ class PermissionChecker:
         elif "GL_PROJECT_PATH" in os.environ:
             self.repository = os.environ["GL_PROJECT_PATH"]
         else:
-            self.repository = re.sub("\.git", "", re.sub(".*/", "", os.getcwd()))
+            self.repository = re.sub(r"\.git", "", re.sub(r".*/", "", os.getcwd()))
 
 
 
@@ -107,15 +101,16 @@ class PermissionChecker:
     def read_branch(self):
         """Read the branchname by stripping leading refs/heads"""
 
-        self.branch = self.ref[11:] # refs/heads/master -> master
+        self.branch = self.ref[11:]  # refs/heads/master -> master
 
 
     def read_commitmsg(self):
         """reads the commit messages"""
-        
+
         self.commitmsg = ""
-        gitlog = subprocess.Popen(["git", "log", self.oldtree + ".." + self.newtree], stderr=DEVNULL, stdout=subprocess.PIPE)
-        stdout = gitlog.communicate()[0];
+        gitlog = subprocess.Popen(["git", "log", self.oldtree + ".." + self.newtree],
+                                  stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
+        stdout = gitlog.communicate()[0].decode()
         for row in stdout.splitlines():
             if len(row) > 0 and row[0] == " ":
                 self.commitmsg = self.commitmsg + row.strip()
@@ -124,38 +119,39 @@ class PermissionChecker:
     def generate_query_string(self):
         """generates the url query string based on previously read information"""
 
-        url = "repository=" + urllib.quote(self.repository) \
-            + "&branch=" + urllib.quote(self.branch) \
-            + "&user=" + urllib.quote(self.user)
+        url = "repository=" + urllib.parse.quote(self.repository) \
+            + "&branch=" + urllib.parse.quote(self.branch) \
+            + "&user=" + urllib.parse.quote(self.user)
         if self.group != "":
-            url = url + "&group=" + urllib.quote(self.group)
-            
-        url = url + "&commitmsg=" + urllib.quote(self.commitmsg[0:3000])
+            url = url + "&group=" + urllib.parse.quote(self.group)
+
+        url = url + "&commitmsg=" + urllib.parse.quote(self.commitmsg[0:3000])
         return url
 
 
     def query_webservice(self):
         urlsuffix = "?" + self.generate_query_string()
-        
+
         for url in self.urls:
-            u = urlparse.urlparse(url)
+            u = urllib.parse.urlparse(url)
 
             # Connect to server
             if u.scheme == "https":
-                con = httplib.HTTPSConnection(u.hostname, u.port)
+                con = http.client.HTTPSConnection(u.hostname, u.port)
             else:
-                con = httplib.HTTPConnection(u.hostname, u.port)
+                con = http.client.HTTPConnection(u.hostname, u.port)
 
             # Send request
             headers = {"Content-Type": "application/json"}
-            if not u.username == None and not u.password == None:
-                headers["Authorization"] = "Basic " + base64.b64encode(u.username + ":" + u.password)
+            if u.username is not None and u.password is not None:
+                credentials = base64.b64encode(f"{u.username}:{u.password}".encode()).decode()
+                headers["Authorization"] = "Basic " + credentials
             url_prefix = u.scheme + "://" + u.hostname + u.path
             con.request("GET", url_prefix + urlsuffix, None, headers)
 
             # Verify response, forward messages, set exit code
             response = con.getresponse()
-            print(response.read())
+            print(response.read().decode())
             if response.status != 200:
                 sys.exit(1)
 
@@ -172,6 +168,7 @@ def main(argv=None):
     checker.read_branch()
     checker.read_commitmsg()
     checker.query_webservice()
+
 
 if __name__ == "__main__":
     sys.exit(main())
