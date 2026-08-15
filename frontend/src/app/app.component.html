@@ -1,18 +1,18 @@
-<h1>{{title}}</h1>
+<h1>Postsai Commit Permissions</h1>
 
 
-<textarea [(ngModel)]='currentConfig.configText' rows="24" cols="80"
+<textarea [(ngModel)]='currentConfig().configText' rows="24" cols="80"
 	style="width: 80%">
 </textarea>
 <br>
 
 Comment:
-<input type="text" [(ngModel)]="currentConfig.changeComment">
+<input type="text" [(ngModel)]="currentConfig().changeComment">
 <button (click)="doSubmit()">submit</button>
 <p>Pick a previous config:</p>
 
 <div>
-	<ngx-datatable [rows]="rows" [columns]="columns"
+	<ngx-datatable [rows]="rows()" [columns]="columns"
 		class="material selection-row" style="width: 80%"
 		(selectedChange)="onSelect()" [columnMode]="'force'" [headerHeight]="'auto'"
 		[footerHeight]="'auto'" [rowHeight]="'auto'" [(selected)]="selected"

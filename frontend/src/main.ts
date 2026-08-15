@@ -1,10 +1,21 @@
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { enableProdMode, provideZoneChangeDetection } from '@angular/core';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { enableProdMode, provideZonelessChangeDetection, importProvidersFrom } from '@angular/core';
 import { environment } from './environments/environment';
-import { AppModule } from './app/app.module';
+
+import { ConfigurationsService } from './app/configurations.service';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule } from '@angular/forms';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { AppComponent } from './app/app.component';
 
 if (environment.production) {
   enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(AppModule, { applicationProviders: [provideZoneChangeDetection()], });
+bootstrapApplication(AppComponent, {
+    providers: [
+        importProvidersFrom(BrowserAnimationsModule, FormsModule, NgxDatatableModule),
+        ConfigurationsService, provideHttpClient(withInterceptorsFromDi())
+    ]
+});

@@ -1,53 +1,35 @@
 {
   "name": "frontend",
-  "version": "0.0.0",
+  "version": "1.1.0",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "test": "ng test",
-    "pree2e": "webdriver-manager update --standalone false --gecko false",
-    "e2e": "protractor"
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
   },
   "private": true,
   "dependencies": {
-    "@angular-devkit/schematics": "^22.1.4",
     "@angular/animations": "^22.1.2",
-    "@angular/common": "^22.1.2",
-    "@angular/compiler": "^22.1.2",
-    "@angular/core": "^22.1.2",
-    "@angular/forms": "^22.1.2",
-    "@angular/platform-browser": "^22.1.2",
-    "@angular/platform-browser-dynamic": "^22.1.2",
-    "@angular/router": "^22.1.2",
-    "@swimlane/ngx-datatable": "^25.0.0",
-    "core-js": "^3.1.4",
-    "lodash.template": "^4.18.1",
-    "rxjs": "^7.0.0",
-    "ts-helpers": "^1.1.2",
-    "tslib": "^2.0.0",
-    "zone.js": "~0.15.1"
+    "@angular/common": "^22.1.0",
+    "@angular/compiler": "^22.1.0",
+    "@angular/core": "^22.1.0",
+    "@angular/forms": "^22.1.0",
+    "@angular/platform-browser": "^22.1.0",
+    "@angular/router": "^22.1.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "@swimlane/ngx-datatable": "^25.0.0"
   },
   "devDependencies": {
     "@angular/build": "^22.1.4",
     "@angular/cli": "^22.1.4",
-    "@angular/compiler-cli": "^22.1.2",
-    "@types/jasmine": "3.3.13",
-    "@types/node": "^26.2.0",
-    "istanbul-lib-instrument": "^6.0.3",
-    "jasmine-core": "~3.5.0",
-    "jasmine-spec-reporter": "~5.0.0",
-    "karma": "~6.4.4",
-    "karma-chrome-launcher": "~3.1.0",
-    "karma-cli": "^2.0.0",
-    "karma-jasmine": "~4.0.0",
-    "karma-remap-istanbul": "^0.0.2",
-    "ts-node": "8.3.0",
-    "typescript": "~6.0.3"
-  },
-  "allowScripts": {
-    "core-js@3.50.0": true,
-    "esbuild@0.28.2": true
+    "@angular/compiler-cli": "^22.1.0",
+    "jsdom": "^28.0.0",
+    "prettier": "^3.8.1",
+    "typescript": "~6.0.2",
+    "vitest": "^4.0.8"
   }
 }
