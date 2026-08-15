@@ -1,6 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 @import '../node_modules/@swimlane/ngx-datatable/themes/material.css';
 
+.error-glyph {
+  background: red;
+  width: 8px !important;
+  height: 8px !important;
+  margin-top: 6px;
+  margin-left: 4px;
+}
+
 html {
   font-family: sans-serif;
 }

@@ -9,6 +9,7 @@ import { FormsModule } from "@angular/forms";
 })
 export class ConfigEditorComponent {
   code = model();
+  private decorationIds: string[] = [];
 
   editorOptions = {
     theme: "vs",
@@ -16,6 +17,7 @@ export class ConfigEditorComponent {
     automaticLayout: true,
     fontSize: 14,
     minimap: { enabled: false },
+    glyphMargin: true,
   };
 
   onEditorInit(editor: any) {
@@ -36,43 +38,43 @@ export class ConfigEditorComponent {
       tokenizer: {
         root: [
           [/^#.*$/, "comment"],
-          [/^[\+\-]/, { token: "operator", next: "@col1" }],
+          [/^[\+\-]/, { token: "operator", next: "@repository" }],
           [/\S+/, "invalid"],
           [/\s+/, "white"],
         ],
-        col1: [
+        repository: [
           [/^#.*$/, { token: "comment", next: "@root" }],
-          [/^[\+\-]/, { token: "operator", next: "@col1" }],
-          [/\S+/, { token: "col1", next: "@col2" }],
+          [/^[\+\-]/, { token: "operator", next: "@repository" }],
+          [/\S+/, { token: "repository", next: "@branch" }],
           [/\s+/, "white"],
         ],
-        col2: [
+        branch: [
           [/^#.*$/, { token: "comment", next: "@root" }],
-          [/^[\+\-]/, { token: "operator", next: "@col1" }],
-          [/\S+/, { token: "col2", next: "@col3" }],
+          [/^[\+\-]/, { token: "operator", next: "@repository" }],
+          [/\S+/, { token: "branch", next: "@user" }],
           [/\s+/, "white"],
         ],
-        col3: [
+        user: [
           [/^#.*$/, { token: "comment", next: "@root" }],
-          [/^[\+\-]/, { token: "operator", next: "@col1" }],
-          [/\S+/, { token: "col3", next: "@col4" }],
+          [/^[\+\-]/, { token: "operator", next: "@repository" }],
+          [/\S+/, { token: "user", next: "@group" }],
           [/\s+/, "white"],
         ],
-        col4: [
+        group: [
           [/^#.*$/, { token: "comment", next: "@root" }],
-          [/^[\+\-]/, { token: "operator", next: "@col1" }],
-          [/\S+/, { token: "col4", next: "@col5" }],
+          [/^[\+\-]/, { token: "operator", next: "@repository" }],
+          [/\S+/, { token: "group", next: "@commitmessage" }],
           [/\s+/, "white"],
         ],
-        col5: [
+        commitmessage: [
           [/^#.*$/, { token: "comment", next: "@root" }],
-          [/^[\+\-]/, { token: "operator", next: "@col1" }],
-          [/\S+/, { token: "col5", next: "@message" }],
+          [/^[\+\-]/, { token: "operator", next: "@repository" }],
+          [/\S+/, { token: "commitmessage", next: "@message" }],
           [/\s+/, "white"],
         ],
         message: [
           [/^#.*$/, { token: "comment", next: "@root" }],
-          [/^[\+\-]/, { token: "operator", next: "@col1" }],
+          [/^[\+\-]/, { token: "operator", next: "@repository" }],
           [/\s+/, "white"],
           [/.+$/, { token: "message", next: "@root" }],
         ],
@@ -86,11 +88,11 @@ export class ConfigEditorComponent {
       rules: [
         { token: "comment", foreground: "6A9955", fontStyle: "italic" },
         { token: "operator", foreground: "FF8000", fontWeight: "bold" },
-        { token: "col1", foreground: "0451A5" },
-        { token: "col2", foreground: "098658" },
-        { token: "col3", foreground: "AF00DB" },
-        { token: "col4", foreground: "A31515" },
-        { token: "col5", foreground: "001080" },
+        { token: "repository", foreground: "0451A5" },
+        { token: "branch", foreground: "098658" },
+        { token: "user", foreground: "AF00DB" },
+        { token: "group", foreground: "A31515" },
+        { token: "commitmessage", foreground: "001080" },
         { token: "message", foreground: "808080", fontStyle: "italic" },
       ],
       colors: {},
@@ -161,6 +163,20 @@ export class ConfigEditorComponent {
     });
 
     monaco.editor.setModelMarkers(model, "owner", markers);
+
+    const decorations = markers.map((m: any) => ({
+      range: new monaco.Range(
+        m.startLineNumber,
+        m.startColumn,
+        m.endLineNumber,
+        m.endColumn,
+      ),
+      options: { glyphMarginClassName: "error-glyph" },
+    }));
+    this.decorationIds = editor.deltaDecorations(
+      this.decorationIds || [],
+      decorations,
+    );
   }
 
   private isValidRegex(str: string): boolean {
