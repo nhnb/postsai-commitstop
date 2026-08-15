@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-# Copyright (c) 2016-2017 HIS e. G.
+# Copyright (c) 2016-2026 HIS e. G.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -19,35 +19,34 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-import sys
 import os
+import sys
 
-# ugly but necessary: also find packages at the root of the package tree
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 import config
 
-from configDb import writeConfigToDB
-from checkPrivilege import checkLinesSyntax
-from response import ret403
+from permissions.configDb import writeConfigToDB
+from permissions.checkPrivilege import checkLinesSyntax
+from permissions.response import ret403
 
 
 def storeConfig(arguments):
-    """ store a new configuration in the database """
-    
-    if not arguments.__contains__("changeComment"):
+    """store a new configuration in the database"""
+
+    if "changeComment" not in arguments:
         ret403("no changeComment")
-    elif not arguments.__contains__("configText"):
+    elif "configText" not in arguments:
         ret403("no configText.\n")
     elif not config.repository_status_permission():
         ret403("no permission to alter configuration.")
     else:
-        (syntaxOkay, syntaxMsg) = checkLinesSyntax(arguments["configText"]);
+        syntaxOkay, syntaxMsg = checkLinesSyntax(arguments["configText"])
         if not syntaxOkay:
             ret403("Syntax error in search configuration: " + syntaxMsg)
         else:
             username = os.environ.get("REMOTE_USER", "-")
-            if "repository_status_username" in vars(config):
+            if hasattr(config, "repository_status_username"):
                 username = config.repository_status_username()
             data = (arguments["configText"], username, arguments["changeComment"])
             writeConfigToDB(data)

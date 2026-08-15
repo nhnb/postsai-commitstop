@@ -1,13 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Service, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import {Submission} from './submission'
 import {Configuration} from './configuration'
-
-
-
 
 
 function dateToStr( d: Date ) {
@@ -25,10 +22,10 @@ function formatDate( str: string ) {
 ];
 */
 
-@Injectable()
+@Service()
 export class ConfigurationsService {
+    private httpClient = inject(HttpClient);
 
-    constructor( private httpClient: HttpClient ) { }
 
     private baseUrl = '../../api.py'; // TODO URL to web api
 

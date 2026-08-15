@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 '''
  -- commit permission check for CVS
@@ -13,18 +13,12 @@ This script should be invoked by the verifymsg file in CVSROOT.
 
 import base64
 import getopt
-import httplib
+import http.client
 import os
 import re
 import subprocess
 import sys
-import urlparse
-import urllib
-
-try:
-    from subprocess import DEVNULL # py3k
-except ImportError:
-    DEVNULL = open(os.devnull, 'wb')
+import urllib.parse
 
 
 class PermissionChecker:
@@ -40,7 +34,7 @@ class PermissionChecker:
         try:
             opts, args = getopt.getopt(sys.argv[1:], "", ["url=", "repository=", "msgfile="])
         except:
-            print "Command line: --repository=name --url=https://example.com/postsai/extensions/commitstop/api.py --msgfile=%l"
+            print("Command line: --repository=name --url=https://example.com/postsai/extensions/commitstop/api.py --msgfile=%l")
             sys.exit(2)
 
         for o, a in opts:
@@ -51,10 +45,10 @@ class PermissionChecker:
             elif o == "--msgfile":
                 self.msg_file = a
 
-        if self.repository == None or len(self.urls) == 0:
-            print "Command line: --repository=name --url=https://example.com/postsai/extensions/commitstop/api.py --msgfile=%l"
+        if self.repository is None or len(self.urls) == 0:
+            print("Command line: --repository=name --url=https://example.com/postsai/extensions/commitstop/api.py --msgfile=%l")
             sys.exit(2)
-             
+
 
     def read_user(self):
         """ reads author from $CVS_USER or $USER"""
@@ -70,11 +64,12 @@ class PermissionChecker:
 
         self.branch = "HEAD"
 
-        cvs = subprocess.Popen(["/usr/bin/cvs", "-qn", "status"], stderr=DEVNULL, stdout=subprocess.PIPE)
-        stdout = cvs.communicate()[0];
+        cvs = subprocess.Popen(["/usr/bin/cvs", "-qn", "status"],
+                               stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
+        stdout = cvs.communicate()[0].decode()
         for row in stdout.splitlines():
             if "Sticky Tag:" in row:
-                m = re.search("[ \t]*Sticky Tag:[ \t]*([^( \t]*)", row)
+                m = re.search(r"[ \t]*Sticky Tag:[ \t]*([^( \t]*)", row)
                 branch = m.group(1)
                 if branch != "(none)" and branch != "":
                     self.branch = branch
@@ -90,34 +85,35 @@ class PermissionChecker:
     def generate_query_string(self):
         """generates the url query string based on previously read information"""
 
-        return "repository=" + urllib.quote(self.repository) \
-            + "&branch=" + urllib.quote(self.branch) \
-            + "&user=" + urllib.quote(self.user) \
-            + "&commitmsg=" + urllib.quote(self.commitmsg[0:7000])
+        return "repository=" + urllib.parse.quote(self.repository) \
+            + "&branch=" + urllib.parse.quote(self.branch) \
+            + "&user=" + urllib.parse.quote(self.user) \
+            + "&commitmsg=" + urllib.parse.quote(self.commitmsg[0:7000])
 
 
     def query_webservice(self):
         urlsuffix = "?" + self.generate_query_string()
 
         for url in self.urls:
-            u = urlparse.urlparse(url)
+            u = urllib.parse.urlparse(url)
 
             # Connect to server
             if u.scheme == "https":
-                con = httplib.HTTPSConnection(u.hostname, u.port)
+                con = http.client.HTTPSConnection(u.hostname, u.port)
             else:
-                con = httplib.HTTPConnection(u.hostname, u.port)
+                con = http.client.HTTPConnection(u.hostname, u.port)
 
             # Send request
             headers = {"Content-Type": "application/json"}
-            if not u.username == None and not u.password == None:
-                headers["Authorization"] = "Basic " + base64.b64encode(u.username + ":" + u.password)
+            if u.username is not None and u.password is not None:
+                credentials = base64.b64encode(f"{u.username}:{u.password}".encode()).decode()
+                headers["Authorization"] = "Basic " + credentials
             url_prefix = u.scheme + "://" + u.hostname + u.path
             con.request("GET", url_prefix + urlsuffix, None, headers)
 
             # Verify response, forward messages, set exit code
             response = con.getresponse()
-            print(response.read())
+            print(response.read().decode())
             if response.status != 200:
                 sys.exit(1)
 
@@ -131,6 +127,7 @@ def main(argv=None):
     checker.read_branch()
     checker.read_commitmsg()
     checker.query_webservice()
+
 
 if __name__ == "__main__":
     sys.exit(main())

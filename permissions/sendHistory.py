@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-# Copyright (c) 2016-2017 HIS e. G.
+# Copyright (c) 2016-2026 HIS e. G.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -19,18 +19,16 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-
-from response import retJson
-from configDb import fetchConfigs
-
+from permissions.response import retJson
+from permissions.configDb import fetchConfigs
 
 
 def sendHistory(maximumNumber):
-    """ sends the last $maximimNumber configurations to the client """
-    
+    """sends the last $maximumNumber configurations to the client"""
+
     try:
         maximum = int(maximumNumber)
     except ValueError:
         maximum = 100
-    configs = fetchConfigs(maximum);
+    configs = fetchConfigs(maximum)
     retJson(configs)

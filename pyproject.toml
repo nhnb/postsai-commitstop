@@ -1,0 +1,9 @@
+[project]
+name = "commitstop"
+version = "1.1.0"
+description = "Commit permission check service"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+dev = ["pytest"]

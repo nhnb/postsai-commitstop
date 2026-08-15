@@ -1,7 +1,7 @@
-#! /usr/bin/python
+#!/usr/bin/env python3
 
 # The MIT License (MIT)
-# Copyright (c) 2016-2018 HIS e. G.
+# Copyright (c) 2016-2026 HIS e. G.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -21,23 +21,16 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-
-
-import sys
-import os
 import json
-import cgi
+import os
+import sys
+from urllib.parse import parse_qs
 
-
-# ugly but necessary: also find packages at the root of the package tree
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
-
 
 from permissions.storeConfig import storeConfig
 from permissions.checkPrivilege import checkPrivilege
 from permissions.sendHistory import sendHistory
-
-
 
 
 # dispatch call: can be
@@ -45,11 +38,12 @@ from permissions.sendHistory import sendHistory
 # - a GET request that fetches the history of configuration changes, or
 # - a GET request that queries the curently active configuration whether a commit is allowed
 if __name__ == '__main__':
-    if os.environ.has_key('REQUEST_METHOD') and os.environ['REQUEST_METHOD'] == "POST":
+    if os.environ.get('REQUEST_METHOD') == "POST":
         storeConfig(json.loads(sys.stdin.read()))
     else:
-        arguments = cgi.FieldStorage()
-        if arguments.__contains__("history"):
-            sendHistory(arguments["history"].value)
-        else: checkPrivilege(arguments)
-
+        query_string = os.environ.get('QUERY_STRING', '')
+        arguments = parse_qs(query_string)
+        if "history" in arguments:
+            sendHistory(arguments["history"][0])
+        else:
+            checkPrivilege(arguments)
