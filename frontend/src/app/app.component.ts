@@ -1,19 +1,20 @@
 import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+import { DatatableComponent } from '@swimlane/ngx-datatable';
 
 import { Configuration } from './configuration';
 import { Submission } from './submission';
-
 import { ConfigurationsService } from './configurations.service';
-import { FormsModule } from '@angular/forms';
-import { DatatableComponent } from '@swimlane/ngx-datatable';
+import { ConfigEditorComponent } from './config-editor.component';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [FormsModule, DatatableComponent]
+    imports: [FormsModule, DatatableComponent, ConfigEditorComponent]
 })
 export class AppComponent implements OnInit {
     private configurationsService = inject(ConfigurationsService);
