@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { OnInit } from '@angular/core';
 
 import { Configuration } from './configuration';
@@ -9,7 +9,9 @@ import { ConfigurationsService } from './configurations.service';
 @Component( {
     selector: 'app-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+    styleUrls: ['./app.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AppComponent implements OnInit {
 
@@ -39,7 +41,7 @@ export class AppComponent implements OnInit {
 
     currentConfig = new Configuration( "- .* .* .* .* .*", "comment" );
 
-    rows: Submission[];
+    rows: Submission[] = [];
 
     columns = [
         { prop: 'changetime', name: 'Activation Date', sortable: false },
@@ -49,12 +51,15 @@ export class AppComponent implements OnInit {
 
     selected: Submission[] = [];
 
-    onSelect( event ) {
-        if ( this.selected.length > 0 )
-            this.currentConfig = this.selected[0].config.clone();
+    onSelect() {
+        if ( this.selected.length > 0 ) {
+            queueMicrotask( () => {
+                this.currentConfig = this.selected[0].config.clone();
+            });
+        }
     }
 
-    doSubmit( event ) {
+    doSubmit() {
         if ( this.rows.length > 0 && this.currentConfig.sameAs( this.rows[0].config ) )
             alert( "Not saved. Configuration is already active." );
         else if ( confirm( "Save new configuration?" ) ) {
