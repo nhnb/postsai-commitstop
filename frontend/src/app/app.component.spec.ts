@@ -2,11 +2,13 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { AppComponent } from './app.component';
+import { provideMonacoEditor } from 'ngx-monaco-editor-v2';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent, HttpClientTestingModule],
+      providers: [provideMonacoEditor()]
     }).compileComponents();
   });
 
