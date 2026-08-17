@@ -24,11 +24,11 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-import config
+import config  # noqa: E40
 
-from permissions.configDb import writeConfigToDB
-from permissions.checkPrivilege import checkLinesSyntax
-from permissions.response import ret403
+from permissions.configDb import writeConfigToDB  # noqa: E40
+from permissions.checkPrivilege import checkLinesSyntax  # noqa: E40
+from permissions.response import ret403  # noqa: E40
 
 
 def storeConfig(arguments):

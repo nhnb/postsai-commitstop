@@ -26,11 +26,11 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 try:
-    from permissions.configDb import fetchLatestConfig
+    from permissions.configDb import fetchLatestConfig  # noqa: E40
 except ImportError:
     pass
 
-from permissions.response import ret403, ret200
+from permissions.response import ret403, ret200  # noqa: E40
 
 
 def matchesPattern(name, pattern):

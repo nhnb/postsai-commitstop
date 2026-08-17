@@ -28,9 +28,9 @@ from urllib.parse import parse_qs
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from permissions.storeConfig import storeConfig
-from permissions.checkPrivilege import checkPrivilege
-from permissions.sendHistory import sendHistory
+from permissions.storeConfig import storeConfig  # noqa: E402
+from permissions.checkPrivilege import checkPrivilege  # noqa: E402
+from permissions.sendHistory import sendHistory  # noqa: E402
 
 
 # dispatch call: can be
