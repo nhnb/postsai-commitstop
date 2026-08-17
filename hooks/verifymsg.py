@@ -33,7 +33,7 @@ class PermissionChecker:
 
         try:
             opts, args = getopt.getopt(sys.argv[1:], "", ["url=", "repository=", "msgfile="])
-        except:
+        except Exception:
             print("Command line: --repository=name --url=https://example.com/postsai/extensions/commitstop/api.py --msgfile=%l")
             sys.exit(2)
 
